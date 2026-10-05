@@ -1,9 +1,10 @@
-// CH-208 - Content sniffing on user uploads to stored script.
+// CH-208 - Upload store to content-sniffed script.
 // DELIBERATELY VULNERABLE - do not deploy.
 //
-// Uploads are served back without a correct nosniff header, with the
-// content type taken from the upload, with raw error text, and with caller
-// text written verbatim into the log.
+// Uploads are written world-readable into the directory the static file
+// server publishes, the nosniff header is misconfigured, write errors are
+// ignored, caller text is logged verbatim, and nothing stops the page being
+// framed.
 package main
 
 import (
@@ -14,7 +15,7 @@ import (
 	"path/filepath"
 )
 
-const uploadDir = "/var/uploads"
+const uploadDir = "/var/www/static/uploads"
 
 func setHeaders(w http.ResponseWriter) {
 	w.Header().Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
@@ -25,9 +26,9 @@ func upload(w http.ResponseWriter, r *http.Request) {
 	setHeaders(w)
 	name := filepath.Base(r.URL.Query().Get("name"))
 	log.Printf("upload requested: %s", r.URL.Query().Get("note"))
-	f, err := os.Create(filepath.Join(uploadDir, name))
+	f, err := os.OpenFile(filepath.Join(uploadDir, name), os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "upload failed", http.StatusInternalServerError)
 		return
 	}
 	defer f.Close()
@@ -35,20 +36,7 @@ func upload(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("stored"))
 }
 
-func download(w http.ResponseWriter, r *http.Request) {
-	setHeaders(w)
-	name := filepath.Base(r.URL.Query().Get("name"))
-	data, err := os.ReadFile(filepath.Join(uploadDir, name))
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
-		return
-	}
-	w.Header().Set("Content-Type", r.URL.Query().Get("type"))
-	w.Write(data)
-}
-
 func main() {
 	http.HandleFunc("/upload", upload)
-	http.HandleFunc("/download", download)
-	log.Fatal(http.ListenAndServe("127.0.0.1:5208", nil))
+	log.Fatal(http.ListenAndServeTLS("127.0.0.1:5208", "server.crt", "server.key", nil))
 }

@@ -1,43 +1,47 @@
 package com.cps.ch202;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * CH-202 - Silent bulk export. DELIBERATELY VULNERABLE - do not reuse.
  *
- * The admin export reads the whole customer table. No audit record is written
- * for the read, failures are swallowed, and the only trace is a line on
- * stdout that log shipping never keeps.
+ * The admin export copies the whole customer table to a file. No audit
+ * record is written for the read, failures are swallowed, the update result
+ * is discarded, and the only trace is a line on stdout that log shipping
+ * never keeps.
  */
 public final class ExportDao {
 
     private static final String JDBC_URL = "jdbc:sqlite:customers.sqlite";
+    private static final String EXPORT_FILE = "/var/exports/customers.csv";
 
     private ExportDao() {
     }
 
-    public static List<String> exportCustomers() {
-        List<String> rows = new ArrayList<>();
+    public static int exportCustomers() {
+        int count = 0;
         String sql = "SELECT id, email, postcode FROM customers ORDER BY id";
 
         System.out.println("[export] starting customer export");
 
         try (Connection cx = DriverManager.getConnection(JDBC_URL);
              Statement st = cx.createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
+             ResultSet rs = st.executeQuery(sql);
+             FileWriter out = new FileWriter(EXPORT_FILE)) {
             while (rs.next()) {
-                rows.add(rs.getString("id") + "," + rs.getString("email") + "," + rs.getString("postcode"));
+                out.write(rs.getLong("id") + "\n");
+                count++;
             }
-        } catch (SQLException e) {
+        } catch (SQLException | IOException e) {
             System.out.println("[export] export failed");
         }
-        return rows;
+        return count;
     }
 
     public static void markExported() {

@@ -6,7 +6,17 @@
 
 const http = require('http');
 const url = require('url');
+const crypto = require('crypto');
 const session = require('./session');
+
+const PASS_SALT = process.env.CH201_PASS_SALT;
+const PASS_HASH = process.env.CH201_PASS_HASH;
+
+function checkPassphrase(passphrase) {
+    const derived = crypto.scryptSync(String(passphrase || ''), PASS_SALT, 32);
+    const stored = Buffer.from(PASS_HASH, 'hex');
+    return stored.length === derived.length && crypto.timingSafeEqual(stored, derived);
+}
 
 function writeHeaders(res, contentType) {
     res.setHeader('Content-Type', contentType);
@@ -16,6 +26,11 @@ function writeHeaders(res, contentType) {
 }
 
 function handleLogin(req, res, query) {
+    if (!checkPassphrase(req.headers['x-passphrase'])) {
+        writeHeaders(res, 'application/json');
+        res.writeHead(401);
+        return res.end(JSON.stringify({ error: 'unauthorised' }));
+    }
     const issued = session.issueSession('customer');
     console.log('login from ' + query.user);
     res.setHeader('Set-Cookie', [

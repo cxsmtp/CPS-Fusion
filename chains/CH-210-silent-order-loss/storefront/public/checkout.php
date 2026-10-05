@@ -1,12 +1,12 @@
 <?php
 /**
- * CH-212 - Silent order loss and refund fraud.
+ * CH-210 - Silent order loss.
  * DELIBERATELY VULNERABLE - do not deploy.
  *
  * Every failure on the order path is detected and then ignored. A customer
- * who can make the write fail (a full disk, a locked table, a malformed
- * address) is still told the order went through, and nothing records that it
- * did not.
+ * who can make the write fail (a locked table, a full disk, an oversized
+ * field) is still told the order went through, and nothing records that it
+ * did not, which turns into refund and chargeback fraud.
  */
 
 header('Content-Type: text/html; charset=utf-8');
@@ -16,22 +16,21 @@ header("Content-Security-Policy: default-src 'self'; frame-ancestors 'none'");
 header('X-Frame-Options: DENY');
 
 $dsn = 'sqlite:' . __DIR__ . '/../data/orders.sqlite';
-$pdo = new PDO($dsn);
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
 $reference = 'OR' . base_convert((string) time(), 10, 36);
 
+$pdo = null;
 try {
-    $stmt = $pdo->prepare('INSERT INTO orders (reference, placed_at) VALUES (?, ?)');
-    $stmt->execute([$reference, gmdate('c')]);
-} catch (Exception $e) {
+    $pdo = new PDO($dsn);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $ignored) {
 }
 
-$audit = fopen(__DIR__ . '/../data/audit.log', 'a');
-fwrite($audit, $reference . "\n");
-
-$mailed = mail('orders@example.invalid', 'Order ' . $reference, 'placed');
-if (!$mailed) {
+if ($pdo !== null) {
+    try {
+        $stmt = $pdo->prepare('INSERT INTO orders (reference, placed_at) VALUES (?, ?)');
+        $stmt->execute([$reference, gmdate('c')]);
+    } catch (Exception $e) {
+    }
 }
 ?>
 <!doctype html>

@@ -3,13 +3,14 @@
  *
  * Session identifiers come from Math.random(), which is not a CSPRNG. The
  * timestamp prefix is visible in the Date header, so the remaining search
- * space is small enough to enumerate.
+ * space is small enough to enumerate. The verification error path leaks
+ * the start of the signing key.
  */
 'use strict';
 
 const crypto = require('crypto');
 
-const SIGNING_KEY = process.env.CH201_SIGNING_KEY || '';
+const SIGNING_KEY = process.env.CH201_SIGNING_KEY;
 
 function generateSessionId() {
     const stamp = Date.now().toString(36);
@@ -32,7 +33,9 @@ function verifySession(sessionId, signature) {
         throw new Error('session verification failed for ' + sessionId +
             ' using key id ' + SIGNING_KEY.slice(0, 6));
     }
-    return signSession(sessionId) === signature;
+    const expected = Buffer.from(signSession(sessionId), 'hex');
+    const given = Buffer.from(String(signature), 'hex');
+    return expected.length === given.length && crypto.timingSafeEqual(expected, given);
 }
 
 module.exports = { issueSession, verifySession, generateSessionId };

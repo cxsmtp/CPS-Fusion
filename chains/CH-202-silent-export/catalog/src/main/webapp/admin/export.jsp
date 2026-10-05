@@ -1,8 +1,7 @@
-<%@ page contentType="text/csv; charset=UTF-8" import="com.cps.ch202.ExportDao" %>
+<%@ page contentType="text/plain; charset=UTF-8" import="com.cps.ch202.ExportDao" %>
 <%
     response.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
-    for (String row : ExportDao.exportCustomers()) {
-        out.println(row);
-    }
+    int exported = ExportDao.exportCustomers();
     ExportDao.markExported();
+    out.println("exported " + exported);
 %>

@@ -1,8 +1,0 @@
-{
-  "name": "cps-ch211-web",
-  "version": "1.0.0",
-  "description": "CH-211 specimen. Deliberately vulnerable. Zero dependencies so the SCA surface is empty.",
-  "private": true,
-  "main": "src/storefront.js",
-  "dependencies": {}
-}
