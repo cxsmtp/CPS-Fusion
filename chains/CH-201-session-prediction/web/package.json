@@ -1,0 +1,8 @@
+{
+  "name": "cps-ch201-web",
+  "version": "1.0.0",
+  "description": "CH-201 specimen. Deliberately vulnerable. Zero dependencies so the SCA surface is empty.",
+  "private": true,
+  "main": "src/server.js",
+  "dependencies": {}
+}
