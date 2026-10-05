@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+node_modules/
+target/
+*.war
+*.sqlite
+results*.json
+.DS_Store
+.idea/
+.vscode/
