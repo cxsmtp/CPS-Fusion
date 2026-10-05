@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""Run the four example chains through the CPS engine.
+"""Run the ten scan-proven chains through the CPS engine.
 
-    python demo.py                          # offline, uses fixtures/expected_findings.json
-    python demo.py path/to/results.json     # a real scanner results export
-    python demo.py --chain CH-104           # one chain only
+    python demo.py                          # offline, uses fixtures/scan_findings.json
+    python demo.py path/to/results.json     # another scanner results export
+    python demo.py --chain CH-204           # one chain only
 
-For each chain it prints every constituent finding with the scanner's own
-severity and its individual CPS, then the chain CPS the engine composes from
-them. The point to look for: no finding is rated above Medium, yet every
-chain lands in the High band.
+For each chain it prints every constituent finding with the severity the
+scanner reported and its individual CPS, then the chain CPS the engine
+composes from them. Every finding in the default fixture came from a real
+Checkmarx One scan of this repository, and none is rated above Medium.
 
 Exit code is 0 when every selected chain is fully assembled, 1 otherwise,
 2 on bad input.
@@ -34,7 +34,7 @@ from cps_engine import (  # noqa: E402
     score_findings,
 )
 
-DEFAULT_SCAN = ROOT / "fixtures" / "expected_findings.json"
+DEFAULT_SCAN = ROOT / "fixtures" / "scan_findings.json"
 DEFAULT_CATALOG = ROOT / "catalog" / "chains_index.json"
 
 # Scanner severities, most to least severe. Informational is spelled several
@@ -126,7 +126,7 @@ def main(argv: list[str] | None = None) -> int:
                     help="scanner results export (default: the offline fixture)")
     ap.add_argument("--catalog", type=Path, default=DEFAULT_CATALOG)
     ap.add_argument("--chain", action="append", metavar="ID",
-                    help="limit to a chain id, e.g. CH-101 (repeatable)")
+                    help="limit to a chain id, e.g. CH-201 (repeatable)")
     args = ap.parse_args(argv)
 
     try:
@@ -138,7 +138,8 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     if args.scan == DEFAULT_SCAN:
-        print("Input: offline fixture (expected findings, not a live scan)\n")
+        scan_id = json.loads(args.scan.read_text(encoding="utf-8"))["scanInformation"]["scanId"]
+        print(f"Input: findings from Checkmarx One scan {scan_id}\n")
     else:
         print(f"Input: {args.scan}\n")
 
@@ -158,8 +159,11 @@ def main(argv: list[str] | None = None) -> int:
             f"{worst or 'n/a':<13}{result.chain_cps:>6.2f} {result.chain_cps_band}"
         )
     print()
-    print("  Triaged one finding at a time, nothing here crosses 'fix now'.")
-    print("  Scored as chains, every one of them is High. Fix one link to break each chain.")
+    worst_all = max((w for _, _, w in summary), key=severity_rank, default="")
+    bands = sorted({r.chain_cps_band for r, _, _ in summary},
+                   key=["Negligible", "Low", "Moderate", "High"].index)
+    print(f"  Highest scanner severity in any chain: {worst_all or 'n/a'}.")
+    print(f"  Chain CPS bands: {', '.join(bands)}. Fix one link to break its chain.")
 
     complete = all(r.state is AssemblyState.FULLY_ASSEMBLED for r in results)
     return 0 if complete else 1

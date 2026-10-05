@@ -1,267 +1,1058 @@
 {
-  "version": "1.0",
-  "schema_notes": "CPS-Fusion edition: the four example chains from the CPS writeup (CH-101, CH-104, CH-106, CH-110), taken unchanged from the Nexa Commerce catalogue in CPS-DEMO. Required findings are scoped to their service directory with match_file_contains, so they also match a real scan of this repository.",
+  "version": "2.0",
+  "schema_notes": "CPS-Fusion ten-chain set. Every required finding below was reported by a real Checkmarx One scan (a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb, commit beba8de, 2026-10-05) at the file and line given, with the severity given. Required findings are scoped to their chain folder with match_file_contains, so one query can sit in several chains without crossing over.",
   "chains": [
     {
-      "id": "CH-101",
-      "name": "Predictable Session to Account Takeover (PHP)",
+      "id": "CH-201",
+      "name": "Predictable Session ID to Account Takeover (Node.js)",
+      "short_name": "Session prediction",
       "engines": [
         "SAST"
       ],
-      "tech_stack": "PHP",
+      "tech_stack": "Node.js",
       "validation": {
-        "mode": "expected",
+        "mode": "observed",
         "codebase": "cps-fusion",
-        "location": "chains/CH-101-account-takeover/storefront/",
-        "note": "Severities were verified against real Checkmarx One scans before this codebase was written; see chains_index.json for the observed evidence and finding IDs. This entry is the expectation for a scan of the Nexa Commerce repository."
+        "location": "chains/CH-201-session-prediction/web/",
+        "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+        "commit": "beba8de",
+        "scanned_on": "2026-10-05"
       },
-      "real_world_anchor": "Session-prediction chains of the class seen repeatedly in PHP applications that roll their own session identifiers rather than using the platform session handler.",
-      "terminal_outcome": "Full account takeover with no credential theft. A non-cryptographic PRNG generates the session identifier (F1, F5), the verifier over it uses a broken hash (F2), the cookie is delivered without SameSite protection (F3), and its path scope is broader than the issuing endpoint (F4). Enumerate the PRNG, forge the verifier, deliver the cookie cross-site, and the session is valid site-wide. Highest-severity constituent is Medium.",
-      "expected_chain_cps": 10.0,
+      "terminal_outcome": "Account takeover without stealing a credential. Session IDs come from Math.random() with a clock prefix, so they can be enumerated; the verification error path leaks the start of the signing key and the raw error text reaches the caller; caller text is written into the log unescaped, hiding the probing; and the page ships without a Content-Security-Policy.",
       "required_findings": [
         {
-          "query_name": "Use of Insufficiently Random Values",
-          "engine": "SAST",
-          "default_severity_in_catalog": "Medium",
-          "cwe": 0,
-          "role": "L2_Bridge",
-          "expected_file_glob": "chains/CH-101-account-takeover/storefront/public/login.php",
-          "severity_verification": "verified_medium",
-          "notes": "PHP preset rates this Medium. The same query is rated Low in the JavaScript preset - severity is preset-dependent.",
-          "match_file_contains": "storefront"
-        },
-        {
-          "query_name": "Broken_or_Risky_Hashing_Function",
-          "engine": "SAST",
-          "default_severity_in_catalog": "Medium",
-          "cwe": 0,
-          "role": "L2_Bridge",
-          "expected_file_glob": "chains/CH-101-account-takeover/storefront/public/login.php",
-          "severity_verification": "verified_medium",
-          "match_file_contains": "storefront"
-        },
-        {
-          "query_name": "Insecure_Value_of_the_SameSite_Cookie_Attribute",
-          "engine": "SAST",
-          "default_severity_in_catalog": "Medium",
-          "cwe": 0,
-          "role": "L3_Amplifier",
-          "expected_file_glob": "chains/CH-101-account-takeover/storefront/public/login.php",
-          "severity_verification": "verified_medium",
-          "match_file_contains": "storefront"
-        },
-        {
-          "query_name": "Cookie_Overly_Broad_Path",
+          "query_name": "Use_of_Insufficiently_Random_Values",
           "engine": "SAST",
           "default_severity_in_catalog": "Low",
-          "cwe": 0,
-          "role": "L3_Amplifier",
-          "expected_file_glob": "chains/CH-101-account-takeover/storefront/public/login.php",
-          "severity_verification": "verified_low",
-          "match_file_contains": "storefront"
-        },
-        {
-          "query_name": "Use_of_Non_Cryptographic_Random",
-          "engine": "SAST",
-          "default_severity_in_catalog": "Low",
-          "cwe": 0,
           "role": "L1_Signal",
-          "expected_file_glob": "chains/CH-101-account-takeover/storefront/public/login.php",
-          "severity_verification": "verified_low",
-          "match_file_contains": "storefront"
-        }
-      ],
-      "short_name": "Account takeover"
-    },
-    {
-      "id": "CH-104",
-      "name": "Redirect to Token Theft (JavaScript / Node)",
-      "engines": [
-        "SAST"
-      ],
-      "tech_stack": "JavaScript",
-      "validation": {
-        "mode": "expected",
-        "codebase": "cps-fusion",
-        "location": "chains/CH-104-token-theft/web-gateway/",
-        "note": "Severities were verified against real Checkmarx One scans before this codebase was written; see chains_index.json for the observed evidence and finding IDs. This entry is the expectation for a scan of the Nexa Commerce repository."
-      },
-      "real_world_anchor": "OAuth and session-token theft via redirect abuse, the pattern behind multiple identity-integration incidents where the redirect finding alone was triaged as low priority.",
-      "terminal_outcome": "Third-party capture of a session or access token. An unvalidated redirect hands control to an attacker-chosen destination (F1), no HSTS means a downgrade to plaintext is not refused (F2), no CSP means no policy blocks the outbound request (F3), reverse tabnabbing gives the opened page a handle back to the opener (F4), and log forging lets the attacker pollute the audit trail that would otherwise reconstruct the sequence (F5).",
-      "expected_chain_cps": 9.14,
-      "required_findings": [
-        {
-          "query_name": "Open_Redirect",
-          "engine": "SAST",
-          "default_severity_in_catalog": "Medium",
-          "cwe": 0,
-          "role": "L2_Bridge",
-          "expected_file_glob": "chains/CH-104-token-theft/web-gateway/src/server.js",
-          "severity_verification": "verified_medium",
-          "match_file_contains": "web-gateway"
+          "expected_file_glob": "chains/CH-201-session-prediction/web/src/session.js",
+          "match_file_contains": "CH-201-session-prediction/web/",
+          "severity_verification": "observed_low",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "KnTzs9BxipVo3WZ2QN1WaMoa9qA=",
+              "PYzQdJAQKCK5uL+nw994J+B+8D8="
+            ],
+            "locations": [
+              "chains/CH-201-session-prediction/web/src/session.js:18",
+              "chains/CH-201-session-prediction/web/src/session.js:17"
+            ]
+          }
         },
         {
-          "query_name": "Missing_HSTS_Header",
-          "engine": "SAST",
-          "default_severity_in_catalog": "Medium",
-          "cwe": 0,
-          "role": "L3_Amplifier",
-          "expected_file_glob": "chains/CH-104-token-theft/web-gateway/src/server.js",
-          "severity_verification": "verified_medium",
-          "match_file_contains": "web-gateway"
-        },
-        {
-          "query_name": "Missing_CSP_Header",
+          "query_name": "Client_Insecure_Randomness",
           "engine": "SAST",
           "default_severity_in_catalog": "Low",
-          "cwe": 0,
-          "role": "L3_Amplifier",
-          "expected_file_glob": "chains/CH-104-token-theft/web-gateway/src/server.js",
-          "severity_verification": "verified_low",
-          "match_file_contains": "web-gateway"
+          "role": "L1_Signal",
+          "expected_file_glob": "chains/CH-201-session-prediction/web/src/session.js",
+          "match_file_contains": "CH-201-session-prediction/web/",
+          "severity_verification": "observed_low",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "1ite+EcIzJp0IvqrbfCS5Z6ayKI=",
+              "49jncp3VISB4nPP7GDKy8KfjKic=",
+              "bcb+pfOQq6xGJYOFou+MsE7Jsr8=",
+              "GP2+8haXEGlPiGBUhkzYr0WAXjc="
+            ],
+            "locations": [
+              "chains/CH-201-session-prediction/web/src/session.js:17",
+              "chains/CH-201-session-prediction/web/src/session.js:18",
+              "chains/CH-201-session-prediction/web/src/session.js:17",
+              "chains/CH-201-session-prediction/web/src/session.js:18"
+            ]
+          }
         },
         {
-          "query_name": "Unsafe_Use_Of_Target_blank",
+          "query_name": "Secret_Leak_in_Error_Messages",
           "engine": "SAST",
           "default_severity_in_catalog": "Low",
-          "cwe": 0,
           "role": "L2_Bridge",
-          "expected_file_glob": "chains/CH-104-token-theft/web-gateway/src/server.js",
-          "severity_verification": "verified_low",
-          "match_file_contains": "web-gateway"
+          "expected_file_glob": "chains/CH-201-session-prediction/web/src/session.js",
+          "match_file_contains": "CH-201-session-prediction/web/",
+          "severity_verification": "observed_low",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "75LVuzoNSwBpWoaD+paPL1z9e6M="
+            ],
+            "locations": [
+              "chains/CH-201-session-prediction/web/src/session.js:33"
+            ]
+          }
+        },
+        {
+          "query_name": "Information_Exposure_Through_an_Error_Message",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Low",
+          "role": "L2_Bridge",
+          "expected_file_glob": "chains/CH-201-session-prediction/web/src/server.js",
+          "match_file_contains": "CH-201-session-prediction/web/",
+          "severity_verification": "observed_low",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "u0hD4pubUY0fklZ6mwNmHeUGfGk="
+            ],
+            "locations": [
+              "chains/CH-201-session-prediction/web/src/server.js:66"
+            ]
+          }
         },
         {
           "query_name": "Log_Forging",
           "engine": "SAST",
           "default_severity_in_catalog": "Low",
-          "cwe": 0,
-          "role": "L1_Signal",
-          "expected_file_glob": "chains/CH-104-token-theft/web-gateway/src/server.js",
-          "severity_verification": "verified_low",
-          "match_file_contains": "web-gateway"
+          "role": "L3_Amplifier",
+          "expected_file_glob": "chains/CH-201-session-prediction/web/src/server.js",
+          "match_file_contains": "CH-201-session-prediction/web/",
+          "severity_verification": "observed_low",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "bAxgilcpINoVbP6s9DZHUP1hDI4="
+            ],
+            "locations": [
+              "chains/CH-201-session-prediction/web/src/server.js:54"
+            ]
+          }
+        },
+        {
+          "query_name": "Missing_CSP_Header",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Low",
+          "role": "L3_Amplifier",
+          "expected_file_glob": "chains/CH-201-session-prediction/web/src/server.js",
+          "match_file_contains": "CH-201-session-prediction/web/",
+          "severity_verification": "observed_low",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "SC3sRAAKt01D+L6Dec/f5SjU2U0="
+            ],
+            "locations": [
+              "chains/CH-201-session-prediction/web/src/server.js:68"
+            ]
+          }
         }
-      ],
-      "short_name": "Token theft"
+      ]
     },
     {
-      "id": "CH-106",
-      "name": "Informational-Only Chain to Silent Data Exfiltration",
+      "id": "CH-202",
+      "name": "Informational-Only Chain to Silent Customer Export (Java)",
+      "short_name": "Silent bulk export",
+      "engines": [
+        "SAST"
+      ],
+      "tech_stack": "Java / JSP",
+      "validation": {
+        "mode": "observed",
+        "codebase": "cps-fusion",
+        "location": "chains/CH-202-silent-export/catalog/",
+        "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+        "commit": "beba8de",
+        "scanned_on": "2026-10-05"
+      },
+      "terminal_outcome": "Undetected bulk export of the customer table. The read is never audited, failures are swallowed without a log entry, the only trace goes to stdout, the update result is discarded, and the export page has no error handler. Every link is Informational.",
+      "required_findings": [
+        {
+          "query_name": "Insufficient_Logging_of_Database_Actions",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Informational",
+          "role": "L1_Signal",
+          "expected_file_glob": "chains/CH-202-silent-export/catalog/src/main/java/com/cps/ch202/ExportDao.java",
+          "match_file_contains": "CH-202-silent-export/catalog/",
+          "severity_verification": "observed_informational",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "JIXFjrDc0vfsbkm36Ei26p1MOzg="
+            ],
+            "locations": [
+              "chains/CH-202-silent-export/catalog/src/main/java/com/cps/ch202/ExportDao.java:51"
+            ]
+          }
+        },
+        {
+          "query_name": "Insufficient_Logging_of_Exceptions",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Informational",
+          "role": "L2_Bridge",
+          "expected_file_glob": "chains/CH-202-silent-export/catalog/src/main/java/com/cps/ch202/ExportDao.java",
+          "match_file_contains": "CH-202-silent-export/catalog/",
+          "severity_verification": "observed_informational",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "KgzH/D4DkTqynCI1SESSF6XTneY=",
+              "qIYVvLqbioJjYMPiNUY+m7oaF80="
+            ],
+            "locations": [
+              "chains/CH-202-silent-export/catalog/src/main/java/com/cps/ch202/ExportDao.java:41",
+              "chains/CH-202-silent-export/catalog/src/main/java/com/cps/ch202/ExportDao.java:53"
+            ]
+          }
+        },
+        {
+          "query_name": "ESAPI_Banned_API",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Informational",
+          "role": "L2_Bridge",
+          "expected_file_glob": "chains/CH-202-silent-export/catalog/src/main/java/com/cps/ch202/ExportDao.java",
+          "match_file_contains": "CH-202-silent-export/catalog/",
+          "severity_verification": "observed_informational",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "9x6WBvgPwbHnmmTVdX7BPYH3iBw=",
+              "cL6/A2NOJ80gXykQRR7kjrN7j2I=",
+              "YNmZZh9fc97aubYdFyoljdUOmgU="
+            ],
+            "locations": [
+              "chains/CH-202-silent-export/catalog/src/main/java/com/cps/ch202/ExportDao.java:42",
+              "chains/CH-202-silent-export/catalog/src/main/java/com/cps/ch202/ExportDao.java:31",
+              "chains/CH-202-silent-export/catalog/src/main/java/com/cps/ch202/ExportDao.java:54"
+            ]
+          }
+        },
+        {
+          "query_name": "Unused_Variable",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Informational",
+          "role": "L3_Amplifier",
+          "expected_file_glob": "chains/CH-202-silent-export/catalog/src/main/java/com/cps/ch202/ExportDao.java",
+          "match_file_contains": "CH-202-silent-export/catalog/",
+          "severity_verification": "observed_informational",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "3M9RpBMnWPdrcQl8OiKGQ0CoGPU=",
+              "Df+9ZobT/8bsjVUx1+9Htj1zX3Y=",
+              "ix3A4PruoD38fDmOIbbn5obl9qI="
+            ],
+            "locations": [
+              "chains/CH-202-silent-export/catalog/src/main/java/com/cps/ch202/ExportDao.java:52",
+              "chains/CH-202-silent-export/catalog/src/main/java/com/cps/ch202/ExportDao.java:41",
+              "chains/CH-202-silent-export/catalog/src/main/java/com/cps/ch202/ExportDao.java:53"
+            ]
+          }
+        },
+        {
+          "query_name": "Pages_Without_Global_Error_Handler",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Informational",
+          "role": "L3_Amplifier",
+          "expected_file_glob": "chains/CH-202-silent-export/catalog/src/main/webapp/admin/export.jsp",
+          "match_file_contains": "CH-202-silent-export/catalog/",
+          "severity_verification": "observed_informational",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "CgKU0Efm7OaCVyrh8tvcQR7wthQ="
+            ],
+            "locations": [
+              "chains/CH-202-silent-export/catalog/src/main/webapp/admin/export.jsp:1"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "CH-203",
+      "name": "Shared Temp File to Finance Report Substitution (Java)",
+      "short_name": "Report substitution",
       "engines": [
         "SAST"
       ],
       "tech_stack": "Java",
       "validation": {
-        "mode": "expected",
+        "mode": "observed",
         "codebase": "cps-fusion",
-        "location": "chains/CH-106-silent-exfiltration/catalog-service/",
-        "note": "Severities were verified against real Checkmarx One scans before this codebase was written; see chains_index.json for the observed evidence and finding IDs. This entry is the expectation for a scan of the Nexa Commerce repository."
+        "location": "chains/CH-203-report-swap/reports/",
+        "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+        "commit": "beba8de",
+        "scanned_on": "2026-10-05"
       },
-      "real_world_anchor": "The class of breach that is discovered months later by a third party rather than by the victim, because every control that would have caught it was rated as a code-quality nit.",
-      "terminal_outcome": "Undetected data exfiltration. Queries are assembled dynamically (F1) so the injection surface exists; database actions are not logged (F2) so exploitation leaves no trail; there is no global error handler (F3) so failures surface raw to the caller; error conditions are returned but never acted on (F4) so the application continues in a bad state; and internal detail is written to the system output stream (F5) where it lands in aggregated logs. THIS CHAIN'S CONSTITUENTS ARE ALL RATED INFORMATIONAL - the tier below Low, which most programs never even render in the backlog. It still reaches the High band.",
-      "expected_chain_cps": 9.15,
+      "terminal_outcome": "A local user reads or replaces the nightly finance report. It is staged in the shared temp directory with default permissions, the existence check is always true so it never guards anything, and the move happens with no logging of failure.",
       "required_findings": [
         {
-          "query_name": "Dynamic_SQL_Queries",
+          "query_name": "Creation_of_Temp_File_With_Insecure_Permissions",
           "engine": "SAST",
-          "default_severity_in_catalog": "Information",
-          "cwe": 0,
-          "role": "L2_Bridge",
-          "expected_file_glob": "chains/CH-106-silent-exfiltration/catalog-service/src/main/java/com/nexa/catalog/InventoryDao.java",
-          "severity_verification": "verified_information",
-          "match_file_contains": "catalog-service"
+          "default_severity_in_catalog": "Low",
+          "role": "L1_Signal",
+          "expected_file_glob": "chains/CH-203-report-swap/reports/src/main/java/com/cps/ch203/ReportWriter.java",
+          "match_file_contains": "CH-203-report-swap/reports/",
+          "severity_verification": "observed_low",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "+fwsvjn/KgAeeYnvFKt3degvVmg="
+            ],
+            "locations": [
+              "chains/CH-203-report-swap/reports/src/main/java/com/cps/ch203/ReportWriter.java:25"
+            ]
+          }
         },
         {
-          "query_name": "Insufficient_Logging_of_Database_Actions",
+          "query_name": "Incorrect_Permission_Assignment_For_File_System_Resources",
           "engine": "SAST",
-          "default_severity_in_catalog": "Information",
-          "cwe": 0,
+          "default_severity_in_catalog": "Low",
+          "role": "L2_Bridge",
+          "expected_file_glob": "chains/CH-203-report-swap/reports/src/main/java/com/cps/ch203/ReportWriter.java",
+          "match_file_contains": "CH-203-report-swap/reports/",
+          "severity_verification": "observed_low",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "ANHPyROIYTqkieP8tZZgtiY8gmQ="
+            ],
+            "locations": [
+              "chains/CH-203-report-swap/reports/src/main/java/com/cps/ch203/ReportWriter.java:25"
+            ]
+          }
+        },
+        {
+          "query_name": "Expression_is_Always_True",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Informational",
+          "role": "L2_Bridge",
+          "expected_file_glob": "chains/CH-203-report-swap/reports/src/main/java/com/cps/ch203/ReportWriter.java",
+          "match_file_contains": "CH-203-report-swap/reports/",
+          "severity_verification": "observed_informational",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "c+gnCeL+K7Kr96dHTVQ3s04jlqs=",
+              "ljqQGCZ19vSv8TA8uOXY86l60Q4="
+            ],
+            "locations": [
+              "chains/CH-203-report-swap/reports/src/main/java/com/cps/ch203/ReportWriter.java:31",
+              "chains/CH-203-report-swap/reports/src/main/java/com/cps/ch203/ReportWriter.java:28"
+            ]
+          }
+        },
+        {
+          "query_name": "Insufficient_Logging_of_Exceptions",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Informational",
           "role": "L3_Amplifier",
-          "expected_file_glob": "chains/CH-106-silent-exfiltration/catalog-service/src/main/java/com/nexa/catalog/InventoryDao.java",
-          "severity_verification": "verified_information",
-          "match_file_contains": "catalog-service"
+          "expected_file_glob": "chains/CH-203-report-swap/reports/src/main/java/com/cps/ch203/ReportWriter.java",
+          "match_file_contains": "CH-203-report-swap/reports/",
+          "severity_verification": "observed_informational",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "D7KIT9vy374ngBkHrF+yDVunw8I="
+            ],
+            "locations": [
+              "chains/CH-203-report-swap/reports/src/main/java/com/cps/ch203/ReportWriter.java:37"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "CH-204",
+      "name": "Session Trust Violation to Support-Desk Impersonation (Python)",
+      "short_name": "Support-desk impersonation",
+      "engines": [
+        "SAST"
+      ],
+      "tech_stack": "Python / Flask",
+      "validation": {
+        "mode": "observed",
+        "codebase": "cps-fusion",
+        "location": "chains/CH-204-session-trust/admin_portal/",
+        "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+        "commit": "beba8de",
+        "scanned_on": "2026-10-05"
+      },
+      "terminal_outcome": "A caller plants values in their own session that the support desk later shows to staff as server-set identity. A cookie value is copied from the request, caller text is written into the audit log verbatim, and nothing restricts script on the response.",
+      "required_findings": [
+        {
+          "query_name": "Trust_Boundary_Violation_in_Session_Variables",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Low",
+          "role": "L1_Signal",
+          "expected_file_glob": "chains/CH-204-session-trust/admin_portal/portal.py",
+          "match_file_contains": "CH-204-session-trust/admin_portal/",
+          "severity_verification": "observed_low",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "fuWsS5u0VyjblD6lBMIA/Q/OcOE=",
+              "hUbSlNwa+feFQzWL5nNPtvSmowQ=",
+              "YTmVFZjBE7HuzYQaecuFeJ8vAJE="
+            ],
+            "locations": [
+              "chains/CH-204-session-trust/admin_portal/portal.py:29",
+              "chains/CH-204-session-trust/admin_portal/portal.py:30",
+              "chains/CH-204-session-trust/admin_portal/portal.py:28"
+            ]
+          }
         },
         {
-          "query_name": "Pages_Without_Global_Error_Handler",
+          "query_name": "Cookie_Poisoning",
           "engine": "SAST",
-          "default_severity_in_catalog": "Information",
-          "cwe": 0,
+          "default_severity_in_catalog": "Low",
           "role": "L2_Bridge",
-          "expected_file_glob": "chains/CH-106-silent-exfiltration/catalog-service/src/main/webapp/admin/dashboard.jsp",
-          "severity_verification": "verified_information",
-          "match_file_contains": "catalog-service"
+          "expected_file_glob": "chains/CH-204-session-trust/admin_portal/portal.py",
+          "match_file_contains": "CH-204-session-trust/admin_portal/",
+          "severity_verification": "observed_low",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "aHAnL48Sd3yd0FXhwWIk2R7iKoQ="
+            ],
+            "locations": [
+              "chains/CH-204-session-trust/admin_portal/portal.py:44"
+            ]
+          }
+        },
+        {
+          "query_name": "Log_Forging",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Low",
+          "role": "L3_Amplifier",
+          "expected_file_glob": "chains/CH-204-session-trust/admin_portal/portal.py",
+          "match_file_contains": "CH-204-session-trust/admin_portal/",
+          "severity_verification": "observed_low",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "jWrZmHduY7KDnnub6S7B+FBObN4="
+            ],
+            "locations": [
+              "chains/CH-204-session-trust/admin_portal/portal.py:36"
+            ]
+          }
+        },
+        {
+          "query_name": "Missing_Content_Security_Policy",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Low",
+          "role": "L3_Amplifier",
+          "expected_file_glob": "chains/CH-204-session-trust/admin_portal/portal.py",
+          "match_file_contains": "CH-204-session-trust/admin_portal/",
+          "severity_verification": "observed_low",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "GgYZ80/Yt97JEY0Y3K0Jao4al50="
+            ],
+            "locations": [
+              "chains/CH-204-session-trust/admin_portal/portal.py:45"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "CH-205",
+      "name": "Error Oracle to Catalogue Enumeration (PHP)",
+      "short_name": "Error oracle",
+      "engines": [
+        "SAST"
+      ],
+      "tech_stack": "PHP",
+      "validation": {
+        "mode": "observed",
+        "codebase": "cps-fusion",
+        "location": "chains/CH-205-error-oracle/storefront/",
+        "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+        "commit": "beba8de",
+        "scanned_on": "2026-10-05"
+      },
+      "terminal_outcome": "Schema and data enumeration through error text. Connection failures return the raw driver message, query failures are caught and dropped so an empty catalogue looks like a broken one, and the unchecked update hides the probing from operators.",
+      "required_findings": [
+        {
+          "query_name": "Information_Exposure_Through_an_Error_Message",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Low",
+          "role": "L1_Signal",
+          "expected_file_glob": "chains/CH-205-error-oracle/storefront/public/catalogue.php",
+          "match_file_contains": "CH-205-error-oracle/storefront/",
+          "severity_verification": "observed_low",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "hDcq5eTnkai/zrQAGmy1t8QtDJw="
+            ],
+            "locations": [
+              "chains/CH-205-error-oracle/storefront/public/catalogue.php:23"
+            ]
+          }
+        },
+        {
+          "query_name": "Improper_Exception_Handling",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Low",
+          "role": "L2_Bridge",
+          "expected_file_glob": "chains/CH-205-error-oracle/storefront/public/catalogue.php",
+          "match_file_contains": "CH-205-error-oracle/storefront/",
+          "severity_verification": "observed_low",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "cL3Fy50tbiZf0HJSdbyfija50ko=",
+              "UDwtTrZ+cSwgjRQHyX/KMz+4O8k=",
+              "zm2zevBYw0tMhcGWYvOdYpxiFQ8="
+            ],
+            "locations": [
+              "chains/CH-205-error-oracle/storefront/public/catalogue.php:41",
+              "chains/CH-205-error-oracle/storefront/public/catalogue.php:35",
+              "chains/CH-205-error-oracle/storefront/public/catalogue.php:36"
+            ]
+          }
+        },
+        {
+          "query_name": "Declaration_Of_Catch_For_Generic_Exception",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Informational",
+          "role": "L2_Bridge",
+          "expected_file_glob": "chains/CH-205-error-oracle/storefront/public/catalogue.php",
+          "match_file_contains": "CH-205-error-oracle/storefront/",
+          "severity_verification": "observed_informational",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "hS20b/SNTDL0r/1Ojlmo1LtQZxE="
+            ],
+            "locations": [
+              "chains/CH-205-error-oracle/storefront/public/catalogue.php:37"
+            ]
+          }
+        },
+        {
+          "query_name": "Detection_of_Error_Condition_Without_Action",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Informational",
+          "role": "L3_Amplifier",
+          "expected_file_glob": "chains/CH-205-error-oracle/storefront/public/catalogue.php",
+          "match_file_contains": "CH-205-error-oracle/storefront/",
+          "severity_verification": "observed_informational",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "BLSDarEdqdZsE708GgCsWuFK608="
+            ],
+            "locations": [
+              "chains/CH-205-error-oracle/storefront/public/catalogue.php:37"
+            ]
+          }
         },
         {
           "query_name": "Unchecked_Error_Condition",
           "engine": "SAST",
-          "default_severity_in_catalog": "Information",
-          "cwe": 0,
-          "role": "L1_Signal",
-          "expected_file_glob": "chains/CH-106-silent-exfiltration/catalog-service/src/main/java/com/nexa/catalog/InventoryDao.java",
-          "severity_verification": "verified_information",
-          "match_file_contains": "catalog-service"
-        },
-        {
-          "query_name": "Use_of_System_Output_Stream",
-          "engine": "SAST",
-          "default_severity_in_catalog": "Information",
-          "cwe": 0,
-          "role": "L1_Signal",
-          "expected_file_glob": "chains/CH-106-silent-exfiltration/catalog-service/src/main/java/com/nexa/catalog/InventoryDao.java",
-          "severity_verification": "verified_information",
-          "match_file_contains": "catalog-service"
+          "default_severity_in_catalog": "Informational",
+          "role": "L3_Amplifier",
+          "expected_file_glob": "chains/CH-205-error-oracle/storefront/public/catalogue.php",
+          "match_file_contains": "CH-205-error-oracle/storefront/",
+          "severity_verification": "observed_informational",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "OMZpzT9NthSDxJUjv89uJmVe0cI="
+            ],
+            "locations": [
+              "chains/CH-205-error-oracle/storefront/public/catalogue.php:20"
+            ]
+          }
         }
-      ],
-      "short_name": "Silent data exfiltration"
+      ]
     },
     {
-      "id": "CH-110",
-      "name": "API Auth Weakening to Token Forgery",
+      "id": "CH-206",
+      "name": "Predictable Remember-Me Cookie to Phished Session (PHP)",
+      "short_name": "Remember-me hijack",
+      "engines": [
+        "SAST"
+      ],
+      "tech_stack": "PHP",
+      "validation": {
+        "mode": "observed",
+        "codebase": "cps-fusion",
+        "location": "chains/CH-206-cookie-scope-phish/storefront/",
+        "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+        "commit": "beba8de",
+        "scanned_on": "2026-10-05"
+      },
+      "terminal_outcome": "Long-lived account access. The remember-me value comes from a clock-seeded generator, the cookie is sent to every path on the host, and partner links opened with target=_blank let the opened page navigate the account tab to a look-alike login.",
+      "required_findings": [
+        {
+          "query_name": "Use_of_Non_Cryptographic_Random",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Low",
+          "role": "L1_Signal",
+          "expected_file_glob": "chains/CH-206-cookie-scope-phish/storefront/public/account.php",
+          "match_file_contains": "CH-206-cookie-scope-phish/storefront/",
+          "severity_verification": "observed_low",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "PGfhOGOmB51/ZB2s31B7dwr9M8g="
+            ],
+            "locations": [
+              "chains/CH-206-cookie-scope-phish/storefront/public/account.php:18"
+            ]
+          }
+        },
+        {
+          "query_name": "Cookie_Overly_Broad_Path",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Low",
+          "role": "L2_Bridge",
+          "expected_file_glob": "chains/CH-206-cookie-scope-phish/storefront/public/account.php",
+          "match_file_contains": "CH-206-cookie-scope-phish/storefront/",
+          "severity_verification": "observed_low",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "XrwmAzB/6gBAM1NJLuJIrUWI7AA="
+            ],
+            "locations": [
+              "chains/CH-206-cookie-scope-phish/storefront/public/account.php:20"
+            ]
+          }
+        },
+        {
+          "query_name": "Unsafe_Use_Of_Target_Blank",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Low",
+          "role": "L3_Amplifier",
+          "expected_file_glob": "chains/CH-206-cookie-scope-phish/storefront/public/account.php",
+          "match_file_contains": "CH-206-cookie-scope-phish/storefront/",
+          "severity_verification": "observed_low",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "NTP2nXje9v4fsxACMi9VtrxieQs=",
+              "uyqvOYix1SCQXNPvxBeCFQAjrS0="
+            ],
+            "locations": [
+              "chains/CH-206-cookie-scope-phish/storefront/public/account.php:39",
+              "chains/CH-206-cookie-scope-phish/storefront/public/account.php:41"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "CH-207",
+      "name": "Bearer Token Leak Through URLs and Logs (Node.js)",
+      "short_name": "Token leak",
+      "engines": [
+        "SAST"
+      ],
+      "tech_stack": "Node.js",
+      "validation": {
+        "mode": "observed",
+        "codebase": "cps-fusion",
+        "location": "chains/CH-207-token-leak/gateway/",
+        "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+        "commit": "beba8de",
+        "scanned_on": "2026-10-05"
+      },
+      "terminal_outcome": "Third-party capture of customer bearer tokens and the upstream password. Tokens ride the query string to the partner, the outbound URL and the upstream password are written to the log, caller text can forge log lines, raw errors return stack traces, and the page can be framed.",
+      "required_findings": [
+        {
+          "query_name": "Use of GET Request Method with Sensitive Query Strings",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Low",
+          "role": "L1_Signal",
+          "expected_file_glob": "chains/CH-207-token-leak/gateway/src/gateway.js",
+          "match_file_contains": "CH-207-token-leak/gateway/",
+          "severity_verification": "observed_low",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "PbjBn6yYCfpayGilxemrLpbU5Sg="
+            ],
+            "locations": [
+              "chains/CH-207-token-leak/gateway/src/gateway.js:34"
+            ]
+          }
+        },
+        {
+          "query_name": "Secret_Leak_in_Logs",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Low",
+          "role": "L2_Bridge",
+          "expected_file_glob": "chains/CH-207-token-leak/gateway/src/gateway.js",
+          "match_file_contains": "CH-207-token-leak/gateway/",
+          "severity_verification": "observed_low",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "KPHkwstVLOmp9SY0l9rJA8T8rgE=",
+              "VY8KpdM3N57q8Nm/Aiak24FR460="
+            ],
+            "locations": [
+              "chains/CH-207-token-leak/gateway/src/gateway.js:19",
+              "chains/CH-207-token-leak/gateway/src/gateway.js:23"
+            ]
+          }
+        },
+        {
+          "query_name": "Privacy_Violation_in_Logs",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Low",
+          "role": "L2_Bridge",
+          "expected_file_glob": "chains/CH-207-token-leak/gateway/src/gateway.js",
+          "match_file_contains": "CH-207-token-leak/gateway/",
+          "severity_verification": "observed_low",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "4enhjd1HcM7j/oLBikT/ycwnpIY="
+            ],
+            "locations": [
+              "chains/CH-207-token-leak/gateway/src/gateway.js:34"
+            ]
+          }
+        },
+        {
+          "query_name": "Log_Forging",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Low",
+          "role": "L3_Amplifier",
+          "expected_file_glob": "chains/CH-207-token-leak/gateway/src/gateway.js",
+          "match_file_contains": "CH-207-token-leak/gateway/",
+          "severity_verification": "observed_low",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "2mjrpoA5C1FEGyRBmrKeI60xIho=",
+              "I6CSx7lwaH/4psvCUAF4+nXY/ns="
+            ],
+            "locations": [
+              "chains/CH-207-token-leak/gateway/src/gateway.js:32",
+              "chains/CH-207-token-leak/gateway/src/gateway.js:32"
+            ]
+          }
+        },
+        {
+          "query_name": "Information_Exposure_Through_an_Error_Message",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Low",
+          "role": "L3_Amplifier",
+          "expected_file_glob": "chains/CH-207-token-leak/gateway/src/gateway.js",
+          "match_file_contains": "CH-207-token-leak/gateway/",
+          "severity_verification": "observed_low",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "pZaIxWKAG7B6BuCScbyCE4BLQXs="
+            ],
+            "locations": [
+              "chains/CH-207-token-leak/gateway/src/gateway.js:44"
+            ]
+          }
+        },
+        {
+          "query_name": "Missing_Framing_Policy",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Low",
+          "role": "L3_Amplifier",
+          "expected_file_glob": "chains/CH-207-token-leak/gateway/src/gateway.js",
+          "match_file_contains": "CH-207-token-leak/gateway/",
+          "severity_verification": "observed_low",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "E1/mDcDDVj2srJ+q2/1n5bMwSBw=",
+              "ZX8BLkiKuyKqhEaOCedixKaPA6s="
+            ],
+            "locations": [
+              "chains/CH-207-token-leak/gateway/src/gateway.js:32",
+              "chains/CH-207-token-leak/gateway/src/gateway.js:32"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "CH-208",
+      "name": "World-Readable Upload to Content-Sniffed Script (Go)",
+      "short_name": "Upload to script",
       "engines": [
         "SAST"
       ],
       "tech_stack": "Go",
       "validation": {
-        "mode": "expected",
+        "mode": "observed",
         "codebase": "cps-fusion",
-        "location": "chains/CH-110-token-forgery/auth-service/",
-        "note": "Severities were verified against real Checkmarx One scans before this codebase was written; see chains_index.json for the observed evidence and finding IDs. This entry is the expectation for a scan of the Nexa Commerce repository."
+        "location": "chains/CH-208-content-sniffing/files/",
+        "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+        "commit": "beba8de",
+        "scanned_on": "2026-10-05"
       },
-      "real_world_anchor": "Token-forgery chains against API gateways and auth services, where the signing weakness and the validation gap are separately triaged and separately deferred.",
-      "terminal_outcome": "Forgery of an authentication token accepted by the API. A hardcoded credential in the controller (F1) supplies key material, a weak client-side hash (F2) means the derived value is reproducible, and the JWT is accepted without validating its claims directives (F3) so a forged token with attacker-chosen claims passes verification. Two Mediums and a Low compose into authentication bypass.",
-      "expected_chain_cps": 8.01,
+      "terminal_outcome": "Stored script execution from an upload. The X-Content-Type-Options header is set to a value that does not stop sniffing, so a browser renders HTML out of an uploaded image; caller text is logged verbatim, hiding the upload; and the page can be framed to drive the victim to the file.",
       "required_findings": [
         {
-          "query_name": "Use_of_Hardcoded_Password",
-          "engine": "SAST",
-          "default_severity_in_catalog": "Medium",
-          "cwe": 0,
-          "role": "L2_Bridge",
-          "expected_file_glob": "chains/CH-110-token-forgery/auth-service/main.go",
-          "severity_verification": "verified_medium",
-          "match_file_contains": "auth-service"
-        },
-        {
-          "query_name": "Client_Weak_Cryptographic_Hash",
-          "engine": "SAST",
-          "default_severity_in_catalog": "Medium",
-          "cwe": 0,
-          "role": "L2_Bridge",
-          "expected_file_glob": "chains/CH-110-token-forgery/auth-service/public/js/checkout.js",
-          "severity_verification": "verified_medium",
-          "match_file_contains": "auth-service"
-        },
-        {
-          "query_name": "JWT_No_Claims_Directives_Validation",
+          "query_name": "Misconfigured_X_Content_Type_Options",
           "engine": "SAST",
           "default_severity_in_catalog": "Low",
-          "cwe": 0,
+          "role": "L1_Signal",
+          "expected_file_glob": "chains/CH-208-content-sniffing/files/main.go",
+          "match_file_contains": "CH-208-content-sniffing/files/",
+          "severity_verification": "observed_low",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "EIWS7HbXVBJda13ppSMvId64758=",
+              "QeeQzS+i0XRyyftHFO19WJQAWf8="
+            ],
+            "locations": [
+              "chains/CH-208-content-sniffing/files/main.go:25",
+              "chains/CH-208-content-sniffing/files/main.go:22"
+            ]
+          }
+        },
+        {
+          "query_name": "Log_Forging",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Low",
+          "role": "L2_Bridge",
+          "expected_file_glob": "chains/CH-208-content-sniffing/files/main.go",
+          "match_file_contains": "CH-208-content-sniffing/files/",
+          "severity_verification": "observed_low",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "3V+wZkDoeG3DmdhWLqgpDR8lPpo="
+            ],
+            "locations": [
+              "chains/CH-208-content-sniffing/files/main.go:28"
+            ]
+          }
+        },
+        {
+          "query_name": "Missing_Framing_Policy",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Low",
           "role": "L3_Amplifier",
-          "expected_file_glob": "chains/CH-110-token-forgery/auth-service/main.go",
-          "severity_verification": "verified_low",
-          "match_file_contains": "auth-service"
+          "expected_file_glob": "chains/CH-208-content-sniffing/files/main.go",
+          "match_file_contains": "CH-208-content-sniffing/files/",
+          "severity_verification": "observed_low",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "HZ/TJxc51A/3EusQ/hr7Aih4C0Q="
+            ],
+            "locations": [
+              "chains/CH-208-content-sniffing/files/main.go:25"
+            ]
+          }
         }
+      ]
+    },
+    {
+      "id": "CH-209",
+      "name": "Verbose Operator Console to Untraceable Refund Batch (Java)",
+      "short_name": "Operator console blind spot",
+      "engines": [
+        "SAST"
       ],
-      "short_name": "API token forgery"
+      "tech_stack": "Java / JSP",
+      "validation": {
+        "mode": "observed",
+        "codebase": "cps-fusion",
+        "location": "chains/CH-209-operator-console/console/",
+        "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+        "commit": "beba8de",
+        "scanned_on": "2026-10-05"
+      },
+      "terminal_outcome": "Refund batches run with no reliable trail. Caller text is logged verbatim so entries can be forged, failures print the stack trace to the caller, output goes to banned APIs, the operator credential sits in an unused field, and the console page has no error handler.",
+      "required_findings": [
+        {
+          "query_name": "Log_Forging",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Low",
+          "role": "L1_Signal",
+          "expected_file_glob": "chains/CH-209-operator-console/console/src/main/java/com/cps/ch209/OperatorServlet.java",
+          "match_file_contains": "CH-209-operator-console/console/",
+          "severity_verification": "observed_low",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "NjROiel5Sz1WnAGwYQkNVA7D1Ws="
+            ],
+            "locations": [
+              "chains/CH-209-operator-console/console/src/main/java/com/cps/ch209/OperatorServlet.java:31"
+            ]
+          }
+        },
+        {
+          "query_name": "Information_Exposure_Through_an_Error_Message",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Low",
+          "role": "L2_Bridge",
+          "expected_file_glob": "chains/CH-209-operator-console/console/src/main/java/com/cps/ch209/OperatorServlet.java",
+          "match_file_contains": "CH-209-operator-console/console/",
+          "severity_verification": "observed_low",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "7Y5bliHVZHlCLOt5DT2nh4WBjak=",
+              "Ng9Y7nIO4KFnaKo8LQal7xtoq1k="
+            ],
+            "locations": [
+              "chains/CH-209-operator-console/console/src/main/java/com/cps/ch209/OperatorServlet.java:40",
+              "chains/CH-209-operator-console/console/src/main/java/com/cps/ch209/OperatorServlet.java:40"
+            ]
+          }
+        },
+        {
+          "query_name": "ESAPI_Banned_API",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Informational",
+          "role": "L2_Bridge",
+          "expected_file_glob": "chains/CH-209-operator-console/console/src/main/java/com/cps/ch209/OperatorServlet.java",
+          "match_file_contains": "CH-209-operator-console/console/",
+          "severity_verification": "observed_informational",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "q4VUJy4v7NZh1N0kQxtWID5/NgI="
+            ],
+            "locations": [
+              "chains/CH-209-operator-console/console/src/main/java/com/cps/ch209/OperatorServlet.java:35"
+            ]
+          }
+        },
+        {
+          "query_name": "Unused_Variable",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Informational",
+          "role": "L3_Amplifier",
+          "expected_file_glob": "chains/CH-209-operator-console/console/src/main/java/com/cps/ch209/OperatorServlet.java",
+          "match_file_contains": "CH-209-operator-console/console/",
+          "severity_verification": "observed_informational",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "vcbndVxGaxLy39eLZjLeFK5DVHQ="
+            ],
+            "locations": [
+              "chains/CH-209-operator-console/console/src/main/java/com/cps/ch209/OperatorServlet.java:25"
+            ]
+          }
+        },
+        {
+          "query_name": "Pages_Without_Global_Error_Handler",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Informational",
+          "role": "L3_Amplifier",
+          "expected_file_glob": "chains/CH-209-operator-console/console/src/main/webapp/admin/console.jsp",
+          "match_file_contains": "CH-209-operator-console/console/",
+          "severity_verification": "observed_informational",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "bnlOnkkcC3M+Zz6jc0+DU4QxRYM="
+            ],
+            "locations": [
+              "chains/CH-209-operator-console/console/src/main/webapp/admin/console.jsp:1"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "CH-210",
+      "name": "Swallowed Failures to Refund and Chargeback Fraud (PHP)",
+      "short_name": "Silent order loss",
+      "engines": [
+        "SAST"
+      ],
+      "tech_stack": "PHP",
+      "validation": {
+        "mode": "observed",
+        "codebase": "cps-fusion",
+        "location": "chains/CH-210-silent-order-loss/storefront/",
+        "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+        "commit": "beba8de",
+        "scanned_on": "2026-10-05"
+      },
+      "terminal_outcome": "A customer who can make the order write fail is still told it succeeded, and nothing records that it did not. Connection and write failures are caught generically and dropped. Every link is Low or Informational.",
+      "required_findings": [
+        {
+          "query_name": "Improper_Exception_Handling",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Low",
+          "role": "L1_Signal",
+          "expected_file_glob": "chains/CH-210-silent-order-loss/storefront/public/checkout.php",
+          "match_file_contains": "CH-210-silent-order-loss/storefront/",
+          "severity_verification": "observed_low",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "+eBTDFX9KeG8Ym4TrB+wdCxur4A="
+            ],
+            "locations": [
+              "chains/CH-210-silent-order-loss/storefront/public/checkout.php:31"
+            ]
+          }
+        },
+        {
+          "query_name": "Declaration_Of_Catch_For_Generic_Exception",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Informational",
+          "role": "L2_Bridge",
+          "expected_file_glob": "chains/CH-210-silent-order-loss/storefront/public/checkout.php",
+          "match_file_contains": "CH-210-silent-order-loss/storefront/",
+          "severity_verification": "observed_informational",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "XJqPQi9dJrB5xD31QOLVZjRuFnM="
+            ],
+            "locations": [
+              "chains/CH-210-silent-order-loss/storefront/public/checkout.php:32"
+            ]
+          }
+        },
+        {
+          "query_name": "Detection_of_Error_Condition_Without_Action",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Informational",
+          "role": "L3_Amplifier",
+          "expected_file_glob": "chains/CH-210-silent-order-loss/storefront/public/checkout.php",
+          "match_file_contains": "CH-210-silent-order-loss/storefront/",
+          "severity_verification": "observed_informational",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "lg0O8RhuHn13IYVhnuHluUP66BY=",
+              "zFZRgWDk8dm6lm7y6t8k3If38VI="
+            ],
+            "locations": [
+              "chains/CH-210-silent-order-loss/storefront/public/checkout.php:25",
+              "chains/CH-210-silent-order-loss/storefront/public/checkout.php:32"
+            ]
+          }
+        },
+        {
+          "query_name": "Unchecked_Error_Condition",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Informational",
+          "role": "L3_Amplifier",
+          "expected_file_glob": "chains/CH-210-silent-order-loss/storefront/public/checkout.php",
+          "match_file_contains": "CH-210-silent-order-loss/storefront/",
+          "severity_verification": "observed_informational",
+          "observed": {
+            "scan_id": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+            "finding_ids": [
+              "O6k8f/zNZvUPL3vcXlLV+dghep4="
+            ],
+            "locations": [
+              "chains/CH-210-silent-order-loss/storefront/public/checkout.php:22"
+            ]
+          }
+        }
+      ]
     }
   ]
 }
