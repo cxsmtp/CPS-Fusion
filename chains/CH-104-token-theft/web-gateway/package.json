@@ -1,0 +1,10 @@
+{
+  "name": "nexa-web-gateway",
+  "version": "1.0.0",
+  "description": "Nexa Commerce edge gateway. Zero runtime dependencies by design so the SCA surface is empty and no transitive CVE can push a finding above Medium.",
+  "private": true,
+  "main": "src/server.js",
+  "scripts": { "start": "node src/server.js" },
+  "engines": { "node": ">=20" },
+  "dependencies": {}
+}
