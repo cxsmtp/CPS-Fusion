@@ -1,0 +1,267 @@
+{
+  "version": "1.0",
+  "schema_notes": "CPS-Fusion edition: the four example chains from the CPS writeup (CH-101, CH-104, CH-106, CH-110), taken unchanged from the Nexa Commerce catalogue in CPS-DEMO. Required findings are scoped to their service directory with match_file_contains, so they also match a real scan of this repository.",
+  "chains": [
+    {
+      "id": "CH-101",
+      "name": "Predictable Session to Account Takeover (PHP)",
+      "engines": [
+        "SAST"
+      ],
+      "tech_stack": "PHP",
+      "validation": {
+        "mode": "expected",
+        "codebase": "cps-fusion",
+        "location": "chains/CH-101-account-takeover/storefront/",
+        "note": "Severities were verified against real Checkmarx One scans before this codebase was written; see chains_index.json for the observed evidence and finding IDs. This entry is the expectation for a scan of the Nexa Commerce repository."
+      },
+      "real_world_anchor": "Session-prediction chains of the class seen repeatedly in PHP applications that roll their own session identifiers rather than using the platform session handler.",
+      "terminal_outcome": "Full account takeover with no credential theft. A non-cryptographic PRNG generates the session identifier (F1, F5), the verifier over it uses a broken hash (F2), the cookie is delivered without SameSite protection (F3), and its path scope is broader than the issuing endpoint (F4). Enumerate the PRNG, forge the verifier, deliver the cookie cross-site, and the session is valid site-wide. Highest-severity constituent is Medium.",
+      "expected_chain_cps": 10.0,
+      "required_findings": [
+        {
+          "query_name": "Use of Insufficiently Random Values",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Medium",
+          "cwe": 0,
+          "role": "L2_Bridge",
+          "expected_file_glob": "chains/CH-101-account-takeover/storefront/public/login.php",
+          "severity_verification": "verified_medium",
+          "notes": "PHP preset rates this Medium. The same query is rated Low in the JavaScript preset - severity is preset-dependent.",
+          "match_file_contains": "storefront"
+        },
+        {
+          "query_name": "Broken_or_Risky_Hashing_Function",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Medium",
+          "cwe": 0,
+          "role": "L2_Bridge",
+          "expected_file_glob": "chains/CH-101-account-takeover/storefront/public/login.php",
+          "severity_verification": "verified_medium",
+          "match_file_contains": "storefront"
+        },
+        {
+          "query_name": "Insecure_Value_of_the_SameSite_Cookie_Attribute",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Medium",
+          "cwe": 0,
+          "role": "L3_Amplifier",
+          "expected_file_glob": "chains/CH-101-account-takeover/storefront/public/login.php",
+          "severity_verification": "verified_medium",
+          "match_file_contains": "storefront"
+        },
+        {
+          "query_name": "Cookie_Overly_Broad_Path",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Low",
+          "cwe": 0,
+          "role": "L3_Amplifier",
+          "expected_file_glob": "chains/CH-101-account-takeover/storefront/public/login.php",
+          "severity_verification": "verified_low",
+          "match_file_contains": "storefront"
+        },
+        {
+          "query_name": "Use_of_Non_Cryptographic_Random",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Low",
+          "cwe": 0,
+          "role": "L1_Signal",
+          "expected_file_glob": "chains/CH-101-account-takeover/storefront/public/login.php",
+          "severity_verification": "verified_low",
+          "match_file_contains": "storefront"
+        }
+      ],
+      "short_name": "Account takeover"
+    },
+    {
+      "id": "CH-104",
+      "name": "Redirect to Token Theft (JavaScript / Node)",
+      "engines": [
+        "SAST"
+      ],
+      "tech_stack": "JavaScript",
+      "validation": {
+        "mode": "expected",
+        "codebase": "cps-fusion",
+        "location": "chains/CH-104-token-theft/web-gateway/",
+        "note": "Severities were verified against real Checkmarx One scans before this codebase was written; see chains_index.json for the observed evidence and finding IDs. This entry is the expectation for a scan of the Nexa Commerce repository."
+      },
+      "real_world_anchor": "OAuth and session-token theft via redirect abuse, the pattern behind multiple identity-integration incidents where the redirect finding alone was triaged as low priority.",
+      "terminal_outcome": "Third-party capture of a session or access token. An unvalidated redirect hands control to an attacker-chosen destination (F1), no HSTS means a downgrade to plaintext is not refused (F2), no CSP means no policy blocks the outbound request (F3), reverse tabnabbing gives the opened page a handle back to the opener (F4), and log forging lets the attacker pollute the audit trail that would otherwise reconstruct the sequence (F5).",
+      "expected_chain_cps": 9.14,
+      "required_findings": [
+        {
+          "query_name": "Open_Redirect",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Medium",
+          "cwe": 0,
+          "role": "L2_Bridge",
+          "expected_file_glob": "chains/CH-104-token-theft/web-gateway/src/server.js",
+          "severity_verification": "verified_medium",
+          "match_file_contains": "web-gateway"
+        },
+        {
+          "query_name": "Missing_HSTS_Header",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Medium",
+          "cwe": 0,
+          "role": "L3_Amplifier",
+          "expected_file_glob": "chains/CH-104-token-theft/web-gateway/src/server.js",
+          "severity_verification": "verified_medium",
+          "match_file_contains": "web-gateway"
+        },
+        {
+          "query_name": "Missing_CSP_Header",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Low",
+          "cwe": 0,
+          "role": "L3_Amplifier",
+          "expected_file_glob": "chains/CH-104-token-theft/web-gateway/src/server.js",
+          "severity_verification": "verified_low",
+          "match_file_contains": "web-gateway"
+        },
+        {
+          "query_name": "Unsafe_Use_Of_Target_blank",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Low",
+          "cwe": 0,
+          "role": "L2_Bridge",
+          "expected_file_glob": "chains/CH-104-token-theft/web-gateway/src/server.js",
+          "severity_verification": "verified_low",
+          "match_file_contains": "web-gateway"
+        },
+        {
+          "query_name": "Log_Forging",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Low",
+          "cwe": 0,
+          "role": "L1_Signal",
+          "expected_file_glob": "chains/CH-104-token-theft/web-gateway/src/server.js",
+          "severity_verification": "verified_low",
+          "match_file_contains": "web-gateway"
+        }
+      ],
+      "short_name": "Token theft"
+    },
+    {
+      "id": "CH-106",
+      "name": "Informational-Only Chain to Silent Data Exfiltration",
+      "engines": [
+        "SAST"
+      ],
+      "tech_stack": "Java",
+      "validation": {
+        "mode": "expected",
+        "codebase": "cps-fusion",
+        "location": "chains/CH-106-silent-exfiltration/catalog-service/",
+        "note": "Severities were verified against real Checkmarx One scans before this codebase was written; see chains_index.json for the observed evidence and finding IDs. This entry is the expectation for a scan of the Nexa Commerce repository."
+      },
+      "real_world_anchor": "The class of breach that is discovered months later by a third party rather than by the victim, because every control that would have caught it was rated as a code-quality nit.",
+      "terminal_outcome": "Undetected data exfiltration. Queries are assembled dynamically (F1) so the injection surface exists; database actions are not logged (F2) so exploitation leaves no trail; there is no global error handler (F3) so failures surface raw to the caller; error conditions are returned but never acted on (F4) so the application continues in a bad state; and internal detail is written to the system output stream (F5) where it lands in aggregated logs. THIS CHAIN'S CONSTITUENTS ARE ALL RATED INFORMATIONAL - the tier below Low, which most programs never even render in the backlog. It still reaches the High band.",
+      "expected_chain_cps": 9.15,
+      "required_findings": [
+        {
+          "query_name": "Dynamic_SQL_Queries",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Information",
+          "cwe": 0,
+          "role": "L2_Bridge",
+          "expected_file_glob": "chains/CH-106-silent-exfiltration/catalog-service/src/main/java/com/nexa/catalog/InventoryDao.java",
+          "severity_verification": "verified_information",
+          "match_file_contains": "catalog-service"
+        },
+        {
+          "query_name": "Insufficient_Logging_of_Database_Actions",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Information",
+          "cwe": 0,
+          "role": "L3_Amplifier",
+          "expected_file_glob": "chains/CH-106-silent-exfiltration/catalog-service/src/main/java/com/nexa/catalog/InventoryDao.java",
+          "severity_verification": "verified_information",
+          "match_file_contains": "catalog-service"
+        },
+        {
+          "query_name": "Pages_Without_Global_Error_Handler",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Information",
+          "cwe": 0,
+          "role": "L2_Bridge",
+          "expected_file_glob": "chains/CH-106-silent-exfiltration/catalog-service/src/main/webapp/admin/dashboard.jsp",
+          "severity_verification": "verified_information",
+          "match_file_contains": "catalog-service"
+        },
+        {
+          "query_name": "Unchecked_Error_Condition",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Information",
+          "cwe": 0,
+          "role": "L1_Signal",
+          "expected_file_glob": "chains/CH-106-silent-exfiltration/catalog-service/src/main/java/com/nexa/catalog/InventoryDao.java",
+          "severity_verification": "verified_information",
+          "match_file_contains": "catalog-service"
+        },
+        {
+          "query_name": "Use_of_System_Output_Stream",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Information",
+          "cwe": 0,
+          "role": "L1_Signal",
+          "expected_file_glob": "chains/CH-106-silent-exfiltration/catalog-service/src/main/java/com/nexa/catalog/InventoryDao.java",
+          "severity_verification": "verified_information",
+          "match_file_contains": "catalog-service"
+        }
+      ],
+      "short_name": "Silent data exfiltration"
+    },
+    {
+      "id": "CH-110",
+      "name": "API Auth Weakening to Token Forgery",
+      "engines": [
+        "SAST"
+      ],
+      "tech_stack": "Go",
+      "validation": {
+        "mode": "expected",
+        "codebase": "cps-fusion",
+        "location": "chains/CH-110-token-forgery/auth-service/",
+        "note": "Severities were verified against real Checkmarx One scans before this codebase was written; see chains_index.json for the observed evidence and finding IDs. This entry is the expectation for a scan of the Nexa Commerce repository."
+      },
+      "real_world_anchor": "Token-forgery chains against API gateways and auth services, where the signing weakness and the validation gap are separately triaged and separately deferred.",
+      "terminal_outcome": "Forgery of an authentication token accepted by the API. A hardcoded credential in the controller (F1) supplies key material, a weak client-side hash (F2) means the derived value is reproducible, and the JWT is accepted without validating its claims directives (F3) so a forged token with attacker-chosen claims passes verification. Two Mediums and a Low compose into authentication bypass.",
+      "expected_chain_cps": 8.01,
+      "required_findings": [
+        {
+          "query_name": "Use_of_Hardcoded_Password",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Medium",
+          "cwe": 0,
+          "role": "L2_Bridge",
+          "expected_file_glob": "chains/CH-110-token-forgery/auth-service/main.go",
+          "severity_verification": "verified_medium",
+          "match_file_contains": "auth-service"
+        },
+        {
+          "query_name": "Client_Weak_Cryptographic_Hash",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Medium",
+          "cwe": 0,
+          "role": "L2_Bridge",
+          "expected_file_glob": "chains/CH-110-token-forgery/auth-service/public/js/checkout.js",
+          "severity_verification": "verified_medium",
+          "match_file_contains": "auth-service"
+        },
+        {
+          "query_name": "JWT_No_Claims_Directives_Validation",
+          "engine": "SAST",
+          "default_severity_in_catalog": "Low",
+          "cwe": 0,
+          "role": "L3_Amplifier",
+          "expected_file_glob": "chains/CH-110-token-forgery/auth-service/main.go",
+          "severity_verification": "verified_low",
+          "match_file_contains": "auth-service"
+        }
+      ],
+      "short_name": "API token forgery"
+    }
+  ]
+}
