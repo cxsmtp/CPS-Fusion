@@ -1,0 +1,8 @@
+{
+  "name": "cps-ch207-gateway",
+  "version": "1.0.0",
+  "description": "CH-207 specimen. Deliberately vulnerable. Zero dependencies so the SCA surface is empty.",
+  "private": true,
+  "main": "src/gateway.js",
+  "dependencies": {}
+}

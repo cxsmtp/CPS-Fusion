@@ -1183,6 +1183,73 @@ DEFAULTS: dict[str, DimensionScores] = {
         blast_radius=BlastRadius.MEDIUM,
         impact_proximity=ImpactProximity.LOW,
     ),
+
+    # ----- CPS-Fusion ten-chain set (scan-validated, Low / Info only) ------
+    # Query names observed firing on the CPS-Fusion chain specimens. Without
+    # these entries they would fall back to UNKNOWN_QUERY_DEFAULT.
+    "secret_leak_in_logs": DimensionScores(                   # JS: Low
+        prevalence=Prevalence.HIGH,
+        chain_utility=ChainUtility.HIGH,        # log readers inherit the secret
+        ai_leverage=AILeverage.HIGH,            # log mining is automatable
+        blast_radius=BlastRadius.MEDIUM,
+        impact_proximity=ImpactProximity.HIGH,
+    ),
+    "privacy_violation_in_logs": DimensionScores(             # JS: Low
+        prevalence=Prevalence.HIGH,
+        chain_utility=ChainUtility.MEDIUM,
+        ai_leverage=AILeverage.HIGH,
+        blast_radius=BlastRadius.MEDIUM,
+        impact_proximity=ImpactProximity.MEDIUM,
+    ),
+    "use_of_get_request_method_with_sensitive_query_strings": DimensionScores(  # JS: Low
+        prevalence=Prevalence.HIGH,
+        chain_utility=ChainUtility.HIGH,        # token lands in proxy/referrer logs
+        ai_leverage=AILeverage.MEDIUM,
+        blast_radius=BlastRadius.MEDIUM,
+        impact_proximity=ImpactProximity.HIGH,
+    ),
+    "expression_is_always_true": DimensionScores(             # Java: Info
+        prevalence=Prevalence.MEDIUM,
+        chain_utility=ChainUtility.MEDIUM,      # a guard that never guards
+        ai_leverage=AILeverage.MEDIUM,
+        blast_radius=BlastRadius.LOW,
+        impact_proximity=ImpactProximity.LOW,
+    ),
+    "esapi_banned_api": DimensionScores(                      # Java: Info
+        prevalence=Prevalence.HIGH,
+        chain_utility=ChainUtility.MEDIUM,
+        ai_leverage=AILeverage.MEDIUM,
+        blast_radius=BlastRadius.LOW,
+        impact_proximity=ImpactProximity.LOW,
+    ),
+    "insufficient_logging_of_exceptions": DimensionScores(    # Java: Info
+        prevalence=Prevalence.HIGH,
+        chain_utility=ChainUtility.HIGH,        # failures leave no trail
+        ai_leverage=AILeverage.MEDIUM,
+        blast_radius=BlastRadius.MEDIUM,
+        impact_proximity=ImpactProximity.LOW,
+    ),
+    "unused_variable": DimensionScores(                       # Java: Info
+        prevalence=Prevalence.HIGH,
+        chain_utility=ChainUtility.LOW,         # a result nobody checks
+        ai_leverage=AILeverage.LOW,
+        blast_radius=BlastRadius.LOW,
+        impact_proximity=ImpactProximity.LOW,
+    ),
+    "misconfigured_x_content_type_options": DimensionScores(  # Go: Low
+        prevalence=Prevalence.MEDIUM,
+        chain_utility=ChainUtility.HIGH,        # sniffed uploads execute as script
+        ai_leverage=AILeverage.MEDIUM,
+        blast_radius=BlastRadius.MEDIUM,
+        impact_proximity=ImpactProximity.MEDIUM,
+    ),
+    "improper_error_handling": DimensionScores(               # Go: Low
+        prevalence=Prevalence.HIGH,
+        chain_utility=ChainUtility.MEDIUM,
+        ai_leverage=AILeverage.MEDIUM,
+        blast_radius=BlastRadius.LOW,
+        impact_proximity=ImpactProximity.LOW,
+    ),
 }
 
 

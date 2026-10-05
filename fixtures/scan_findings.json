@@ -1,0 +1,592 @@
+{
+  "_comment": "Real Checkmarx One findings from scan a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb (commit beba8de, 2026-10-05), reduced to the SAST results the ten chains use and written in the Vulnerability Type report shape. Finding ids are the scan's own result ids.",
+  "reportType": "Vulnerability Type",
+  "reportHeader": {
+    "projectName": "CPS-Fusion",
+    "scanners": [
+      "SAST"
+    ]
+  },
+  "scanInformation": {
+    "scanId": "a71e672d-dd27-4bfb-a26a-c7fa4d15e5bb",
+    "totalScannedLoc": 0,
+    "scannedLoc": 0,
+    "iacScannedLoc": 0
+  },
+  "scanResults": {
+    "totalResults": 66,
+    "severitiesBreakdown": [],
+    "resultsList": [
+      {
+        "queryName": "Use_of_Insufficiently_Random_Values",
+        "cweId": 0,
+        "vulnerabilities": [
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-201-session-prediction/web/src/session.js",
+            "destinationLine": 18,
+            "similarityId": "KnTzs9BxipVo3WZ2QN1WaMoa9qA="
+          },
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-201-session-prediction/web/src/session.js",
+            "destinationLine": 17,
+            "similarityId": "PYzQdJAQKCK5uL+nw994J+B+8D8="
+          }
+        ]
+      },
+      {
+        "queryName": "Client_Insecure_Randomness",
+        "cweId": 0,
+        "vulnerabilities": [
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-201-session-prediction/web/src/session.js",
+            "destinationLine": 17,
+            "similarityId": "1ite+EcIzJp0IvqrbfCS5Z6ayKI="
+          },
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-201-session-prediction/web/src/session.js",
+            "destinationLine": 18,
+            "similarityId": "49jncp3VISB4nPP7GDKy8KfjKic="
+          },
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-201-session-prediction/web/src/session.js",
+            "destinationLine": 17,
+            "similarityId": "bcb+pfOQq6xGJYOFou+MsE7Jsr8="
+          },
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-201-session-prediction/web/src/session.js",
+            "destinationLine": 18,
+            "similarityId": "GP2+8haXEGlPiGBUhkzYr0WAXjc="
+          }
+        ]
+      },
+      {
+        "queryName": "Secret_Leak_in_Error_Messages",
+        "cweId": 0,
+        "vulnerabilities": [
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-201-session-prediction/web/src/session.js",
+            "destinationLine": 33,
+            "similarityId": "75LVuzoNSwBpWoaD+paPL1z9e6M="
+          }
+        ]
+      },
+      {
+        "queryName": "Information_Exposure_Through_an_Error_Message",
+        "cweId": 0,
+        "vulnerabilities": [
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-201-session-prediction/web/src/server.js",
+            "destinationLine": 66,
+            "similarityId": "u0hD4pubUY0fklZ6mwNmHeUGfGk="
+          },
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-205-error-oracle/storefront/public/catalogue.php",
+            "destinationLine": 23,
+            "similarityId": "hDcq5eTnkai/zrQAGmy1t8QtDJw="
+          },
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-207-token-leak/gateway/src/gateway.js",
+            "destinationLine": 44,
+            "similarityId": "pZaIxWKAG7B6BuCScbyCE4BLQXs="
+          },
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-209-operator-console/console/src/main/java/com/cps/ch209/OperatorServlet.java",
+            "destinationLine": 40,
+            "similarityId": "7Y5bliHVZHlCLOt5DT2nh4WBjak="
+          },
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-209-operator-console/console/src/main/java/com/cps/ch209/OperatorServlet.java",
+            "destinationLine": 40,
+            "similarityId": "Ng9Y7nIO4KFnaKo8LQal7xtoq1k="
+          }
+        ]
+      },
+      {
+        "queryName": "Log_Forging",
+        "cweId": 0,
+        "vulnerabilities": [
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-201-session-prediction/web/src/server.js",
+            "destinationLine": 54,
+            "similarityId": "bAxgilcpINoVbP6s9DZHUP1hDI4="
+          },
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-204-session-trust/admin_portal/portal.py",
+            "destinationLine": 36,
+            "similarityId": "jWrZmHduY7KDnnub6S7B+FBObN4="
+          },
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-207-token-leak/gateway/src/gateway.js",
+            "destinationLine": 32,
+            "similarityId": "2mjrpoA5C1FEGyRBmrKeI60xIho="
+          },
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-207-token-leak/gateway/src/gateway.js",
+            "destinationLine": 32,
+            "similarityId": "I6CSx7lwaH/4psvCUAF4+nXY/ns="
+          },
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-208-content-sniffing/files/main.go",
+            "destinationLine": 28,
+            "similarityId": "3V+wZkDoeG3DmdhWLqgpDR8lPpo="
+          },
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-209-operator-console/console/src/main/java/com/cps/ch209/OperatorServlet.java",
+            "destinationLine": 31,
+            "similarityId": "NjROiel5Sz1WnAGwYQkNVA7D1Ws="
+          }
+        ]
+      },
+      {
+        "queryName": "Missing_CSP_Header",
+        "cweId": 0,
+        "vulnerabilities": [
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-201-session-prediction/web/src/server.js",
+            "destinationLine": 68,
+            "similarityId": "SC3sRAAKt01D+L6Dec/f5SjU2U0="
+          }
+        ]
+      },
+      {
+        "queryName": "Insufficient_Logging_of_Database_Actions",
+        "cweId": 0,
+        "vulnerabilities": [
+          {
+            "severity": "Informational",
+            "destinationFileName": "/chains/CH-202-silent-export/catalog/src/main/java/com/cps/ch202/ExportDao.java",
+            "destinationLine": 51,
+            "similarityId": "JIXFjrDc0vfsbkm36Ei26p1MOzg="
+          }
+        ]
+      },
+      {
+        "queryName": "Insufficient_Logging_of_Exceptions",
+        "cweId": 0,
+        "vulnerabilities": [
+          {
+            "severity": "Informational",
+            "destinationFileName": "/chains/CH-202-silent-export/catalog/src/main/java/com/cps/ch202/ExportDao.java",
+            "destinationLine": 41,
+            "similarityId": "KgzH/D4DkTqynCI1SESSF6XTneY="
+          },
+          {
+            "severity": "Informational",
+            "destinationFileName": "/chains/CH-202-silent-export/catalog/src/main/java/com/cps/ch202/ExportDao.java",
+            "destinationLine": 53,
+            "similarityId": "qIYVvLqbioJjYMPiNUY+m7oaF80="
+          },
+          {
+            "severity": "Informational",
+            "destinationFileName": "/chains/CH-203-report-swap/reports/src/main/java/com/cps/ch203/ReportWriter.java",
+            "destinationLine": 37,
+            "similarityId": "D7KIT9vy374ngBkHrF+yDVunw8I="
+          }
+        ]
+      },
+      {
+        "queryName": "ESAPI_Banned_API",
+        "cweId": 0,
+        "vulnerabilities": [
+          {
+            "severity": "Informational",
+            "destinationFileName": "/chains/CH-202-silent-export/catalog/src/main/java/com/cps/ch202/ExportDao.java",
+            "destinationLine": 42,
+            "similarityId": "9x6WBvgPwbHnmmTVdX7BPYH3iBw="
+          },
+          {
+            "severity": "Informational",
+            "destinationFileName": "/chains/CH-202-silent-export/catalog/src/main/java/com/cps/ch202/ExportDao.java",
+            "destinationLine": 31,
+            "similarityId": "cL6/A2NOJ80gXykQRR7kjrN7j2I="
+          },
+          {
+            "severity": "Informational",
+            "destinationFileName": "/chains/CH-202-silent-export/catalog/src/main/java/com/cps/ch202/ExportDao.java",
+            "destinationLine": 54,
+            "similarityId": "YNmZZh9fc97aubYdFyoljdUOmgU="
+          },
+          {
+            "severity": "Informational",
+            "destinationFileName": "/chains/CH-209-operator-console/console/src/main/java/com/cps/ch209/OperatorServlet.java",
+            "destinationLine": 35,
+            "similarityId": "q4VUJy4v7NZh1N0kQxtWID5/NgI="
+          }
+        ]
+      },
+      {
+        "queryName": "Unused_Variable",
+        "cweId": 0,
+        "vulnerabilities": [
+          {
+            "severity": "Informational",
+            "destinationFileName": "/chains/CH-202-silent-export/catalog/src/main/java/com/cps/ch202/ExportDao.java",
+            "destinationLine": 52,
+            "similarityId": "3M9RpBMnWPdrcQl8OiKGQ0CoGPU="
+          },
+          {
+            "severity": "Informational",
+            "destinationFileName": "/chains/CH-202-silent-export/catalog/src/main/java/com/cps/ch202/ExportDao.java",
+            "destinationLine": 41,
+            "similarityId": "Df+9ZobT/8bsjVUx1+9Htj1zX3Y="
+          },
+          {
+            "severity": "Informational",
+            "destinationFileName": "/chains/CH-202-silent-export/catalog/src/main/java/com/cps/ch202/ExportDao.java",
+            "destinationLine": 53,
+            "similarityId": "ix3A4PruoD38fDmOIbbn5obl9qI="
+          },
+          {
+            "severity": "Informational",
+            "destinationFileName": "/chains/CH-209-operator-console/console/src/main/java/com/cps/ch209/OperatorServlet.java",
+            "destinationLine": 25,
+            "similarityId": "vcbndVxGaxLy39eLZjLeFK5DVHQ="
+          }
+        ]
+      },
+      {
+        "queryName": "Pages_Without_Global_Error_Handler",
+        "cweId": 0,
+        "vulnerabilities": [
+          {
+            "severity": "Informational",
+            "destinationFileName": "/chains/CH-202-silent-export/catalog/src/main/webapp/admin/export.jsp",
+            "destinationLine": 1,
+            "similarityId": "CgKU0Efm7OaCVyrh8tvcQR7wthQ="
+          },
+          {
+            "severity": "Informational",
+            "destinationFileName": "/chains/CH-209-operator-console/console/src/main/webapp/admin/console.jsp",
+            "destinationLine": 1,
+            "similarityId": "bnlOnkkcC3M+Zz6jc0+DU4QxRYM="
+          }
+        ]
+      },
+      {
+        "queryName": "Creation_of_Temp_File_With_Insecure_Permissions",
+        "cweId": 0,
+        "vulnerabilities": [
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-203-report-swap/reports/src/main/java/com/cps/ch203/ReportWriter.java",
+            "destinationLine": 25,
+            "similarityId": "+fwsvjn/KgAeeYnvFKt3degvVmg="
+          }
+        ]
+      },
+      {
+        "queryName": "Incorrect_Permission_Assignment_For_File_System_Resources",
+        "cweId": 0,
+        "vulnerabilities": [
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-203-report-swap/reports/src/main/java/com/cps/ch203/ReportWriter.java",
+            "destinationLine": 25,
+            "similarityId": "ANHPyROIYTqkieP8tZZgtiY8gmQ="
+          }
+        ]
+      },
+      {
+        "queryName": "Expression_is_Always_True",
+        "cweId": 0,
+        "vulnerabilities": [
+          {
+            "severity": "Informational",
+            "destinationFileName": "/chains/CH-203-report-swap/reports/src/main/java/com/cps/ch203/ReportWriter.java",
+            "destinationLine": 31,
+            "similarityId": "c+gnCeL+K7Kr96dHTVQ3s04jlqs="
+          },
+          {
+            "severity": "Informational",
+            "destinationFileName": "/chains/CH-203-report-swap/reports/src/main/java/com/cps/ch203/ReportWriter.java",
+            "destinationLine": 28,
+            "similarityId": "ljqQGCZ19vSv8TA8uOXY86l60Q4="
+          }
+        ]
+      },
+      {
+        "queryName": "Trust_Boundary_Violation_in_Session_Variables",
+        "cweId": 0,
+        "vulnerabilities": [
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-204-session-trust/admin_portal/portal.py",
+            "destinationLine": 29,
+            "similarityId": "fuWsS5u0VyjblD6lBMIA/Q/OcOE="
+          },
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-204-session-trust/admin_portal/portal.py",
+            "destinationLine": 30,
+            "similarityId": "hUbSlNwa+feFQzWL5nNPtvSmowQ="
+          },
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-204-session-trust/admin_portal/portal.py",
+            "destinationLine": 28,
+            "similarityId": "YTmVFZjBE7HuzYQaecuFeJ8vAJE="
+          }
+        ]
+      },
+      {
+        "queryName": "Cookie_Poisoning",
+        "cweId": 0,
+        "vulnerabilities": [
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-204-session-trust/admin_portal/portal.py",
+            "destinationLine": 44,
+            "similarityId": "aHAnL48Sd3yd0FXhwWIk2R7iKoQ="
+          }
+        ]
+      },
+      {
+        "queryName": "Missing_Content_Security_Policy",
+        "cweId": 0,
+        "vulnerabilities": [
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-204-session-trust/admin_portal/portal.py",
+            "destinationLine": 45,
+            "similarityId": "GgYZ80/Yt97JEY0Y3K0Jao4al50="
+          }
+        ]
+      },
+      {
+        "queryName": "Improper_Exception_Handling",
+        "cweId": 0,
+        "vulnerabilities": [
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-205-error-oracle/storefront/public/catalogue.php",
+            "destinationLine": 41,
+            "similarityId": "cL3Fy50tbiZf0HJSdbyfija50ko="
+          },
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-205-error-oracle/storefront/public/catalogue.php",
+            "destinationLine": 35,
+            "similarityId": "UDwtTrZ+cSwgjRQHyX/KMz+4O8k="
+          },
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-205-error-oracle/storefront/public/catalogue.php",
+            "destinationLine": 36,
+            "similarityId": "zm2zevBYw0tMhcGWYvOdYpxiFQ8="
+          },
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-210-silent-order-loss/storefront/public/checkout.php",
+            "destinationLine": 31,
+            "similarityId": "+eBTDFX9KeG8Ym4TrB+wdCxur4A="
+          }
+        ]
+      },
+      {
+        "queryName": "Declaration_Of_Catch_For_Generic_Exception",
+        "cweId": 0,
+        "vulnerabilities": [
+          {
+            "severity": "Informational",
+            "destinationFileName": "/chains/CH-205-error-oracle/storefront/public/catalogue.php",
+            "destinationLine": 37,
+            "similarityId": "hS20b/SNTDL0r/1Ojlmo1LtQZxE="
+          },
+          {
+            "severity": "Informational",
+            "destinationFileName": "/chains/CH-210-silent-order-loss/storefront/public/checkout.php",
+            "destinationLine": 32,
+            "similarityId": "XJqPQi9dJrB5xD31QOLVZjRuFnM="
+          }
+        ]
+      },
+      {
+        "queryName": "Detection_of_Error_Condition_Without_Action",
+        "cweId": 0,
+        "vulnerabilities": [
+          {
+            "severity": "Informational",
+            "destinationFileName": "/chains/CH-205-error-oracle/storefront/public/catalogue.php",
+            "destinationLine": 37,
+            "similarityId": "BLSDarEdqdZsE708GgCsWuFK608="
+          },
+          {
+            "severity": "Informational",
+            "destinationFileName": "/chains/CH-210-silent-order-loss/storefront/public/checkout.php",
+            "destinationLine": 25,
+            "similarityId": "lg0O8RhuHn13IYVhnuHluUP66BY="
+          },
+          {
+            "severity": "Informational",
+            "destinationFileName": "/chains/CH-210-silent-order-loss/storefront/public/checkout.php",
+            "destinationLine": 32,
+            "similarityId": "zFZRgWDk8dm6lm7y6t8k3If38VI="
+          }
+        ]
+      },
+      {
+        "queryName": "Unchecked_Error_Condition",
+        "cweId": 0,
+        "vulnerabilities": [
+          {
+            "severity": "Informational",
+            "destinationFileName": "/chains/CH-205-error-oracle/storefront/public/catalogue.php",
+            "destinationLine": 20,
+            "similarityId": "OMZpzT9NthSDxJUjv89uJmVe0cI="
+          },
+          {
+            "severity": "Informational",
+            "destinationFileName": "/chains/CH-210-silent-order-loss/storefront/public/checkout.php",
+            "destinationLine": 22,
+            "similarityId": "O6k8f/zNZvUPL3vcXlLV+dghep4="
+          }
+        ]
+      },
+      {
+        "queryName": "Use_of_Non_Cryptographic_Random",
+        "cweId": 0,
+        "vulnerabilities": [
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-206-cookie-scope-phish/storefront/public/account.php",
+            "destinationLine": 18,
+            "similarityId": "PGfhOGOmB51/ZB2s31B7dwr9M8g="
+          }
+        ]
+      },
+      {
+        "queryName": "Cookie_Overly_Broad_Path",
+        "cweId": 0,
+        "vulnerabilities": [
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-206-cookie-scope-phish/storefront/public/account.php",
+            "destinationLine": 20,
+            "similarityId": "XrwmAzB/6gBAM1NJLuJIrUWI7AA="
+          }
+        ]
+      },
+      {
+        "queryName": "Unsafe_Use_Of_Target_Blank",
+        "cweId": 0,
+        "vulnerabilities": [
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-206-cookie-scope-phish/storefront/public/account.php",
+            "destinationLine": 39,
+            "similarityId": "NTP2nXje9v4fsxACMi9VtrxieQs="
+          },
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-206-cookie-scope-phish/storefront/public/account.php",
+            "destinationLine": 41,
+            "similarityId": "uyqvOYix1SCQXNPvxBeCFQAjrS0="
+          }
+        ]
+      },
+      {
+        "queryName": "Use of GET Request Method with Sensitive Query Strings",
+        "cweId": 0,
+        "vulnerabilities": [
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-207-token-leak/gateway/src/gateway.js",
+            "destinationLine": 34,
+            "similarityId": "PbjBn6yYCfpayGilxemrLpbU5Sg="
+          }
+        ]
+      },
+      {
+        "queryName": "Secret_Leak_in_Logs",
+        "cweId": 0,
+        "vulnerabilities": [
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-207-token-leak/gateway/src/gateway.js",
+            "destinationLine": 19,
+            "similarityId": "KPHkwstVLOmp9SY0l9rJA8T8rgE="
+          },
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-207-token-leak/gateway/src/gateway.js",
+            "destinationLine": 23,
+            "similarityId": "VY8KpdM3N57q8Nm/Aiak24FR460="
+          }
+        ]
+      },
+      {
+        "queryName": "Privacy_Violation_in_Logs",
+        "cweId": 0,
+        "vulnerabilities": [
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-207-token-leak/gateway/src/gateway.js",
+            "destinationLine": 34,
+            "similarityId": "4enhjd1HcM7j/oLBikT/ycwnpIY="
+          }
+        ]
+      },
+      {
+        "queryName": "Missing_Framing_Policy",
+        "cweId": 0,
+        "vulnerabilities": [
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-207-token-leak/gateway/src/gateway.js",
+            "destinationLine": 32,
+            "similarityId": "E1/mDcDDVj2srJ+q2/1n5bMwSBw="
+          },
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-207-token-leak/gateway/src/gateway.js",
+            "destinationLine": 32,
+            "similarityId": "ZX8BLkiKuyKqhEaOCedixKaPA6s="
+          },
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-208-content-sniffing/files/main.go",
+            "destinationLine": 25,
+            "similarityId": "HZ/TJxc51A/3EusQ/hr7Aih4C0Q="
+          }
+        ]
+      },
+      {
+        "queryName": "Misconfigured_X_Content_Type_Options",
+        "cweId": 0,
+        "vulnerabilities": [
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-208-content-sniffing/files/main.go",
+            "destinationLine": 25,
+            "similarityId": "EIWS7HbXVBJda13ppSMvId64758="
+          },
+          {
+            "severity": "Low",
+            "destinationFileName": "/chains/CH-208-content-sniffing/files/main.go",
+            "destinationLine": 22,
+            "similarityId": "QeeQzS+i0XRyyftHFO19WJQAWf8="
+          }
+        ]
+      }
+    ]
+  }
+}
