@@ -13,13 +13,18 @@ from __future__ import annotations
 import logging
 
 from flask import Blueprint, make_response, request, session
+from flask_wtf.csrf import CSRFProtect
 
 bp = Blueprint("support_portal", __name__)
 logger = logging.getLogger("support_portal")
+# Registered on the app with csrf.init_app(app); every state-changing view
+# below calls csrf.protect() so a cross-site request is rejected.
+csrf = CSRFProtect()
 
 
 @bp.route("/profile")
 def save_profile():
+    csrf.protect()
     session["display_name"] = request.args.get("display_name", "")
     session["contact_note"] = request.args.get("note", "")
     session["locale"] = request.args.get("locale", "en")
@@ -35,6 +40,7 @@ def audit_event():
 
 @bp.route("/theme")
 def set_theme():
+    csrf.protect()
     theme = request.args.get("theme", "light")
     resp = make_response({"ok": True})
     resp.set_cookie("theme", theme, secure=True, httponly=True, samesite="Strict")
